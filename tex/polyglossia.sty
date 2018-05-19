@@ -1,6 +1,15 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{polyglossia}[2018/04/07 v1.43
-  Alternative to Babel for XeLaTeX and LuaLaTeX]
+% MW 2018-05-19 proof of concept for babel-equivalent language names
+% for an exact list of changes please refer to
+% https://github.com/moewew/polyglossia
+\ProvidesPackage{polyglossia}[2018/05/09 v1.99 ALPHA
+  Unofficial polyglossia proof-of concept]
+\PackageWarningNoLine{polyglossia}{%
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\MessageBreak
+  This is not an official polyglossia version.\MessageBreak
+  Use it at your own risk.\MessageBreak
+  Actually ... don't use it at all.\MessageBreak
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!}
 \RequirePackage{etoolbox}
 \RequirePackage{makecmds}
 \RequirePackage{xkeyval}[2008/08/13]
@@ -645,7 +654,9 @@
    \IfFileExists{gloss-#2.ldf}%
    {\ifcsundef{#2@loaded}%
      {\xpg@input{gloss-#2.ldf}%
+      \undef\xpg@languagename@bblequiv
       \setkeys{#2}{#1}%
+      \csname xpg@bblequivs@#2\endcsname % for complicated languages
       \edef\@tmpa{arabic}%
       \edef\@tmpb{#2}%
       \ifx\@tmpb\@tmpa%
@@ -702,7 +713,9 @@
    \ifcsundef{#2@loaded}%
      {\xpg@nogloss{#2}}%
      {{\select@@language{#2}%
+      \undef\xpg@languagename@bblequiv
       \setkeys{#2}{#1}%
+      \csname xpg@bblequivs@#2\endcsname % for complicated languages
       \use@localhyphenmins{#2}%
       \ifbool{#2@frenchspacing}{\frenchspacing}{\nonfrenchspacing}%
       \csuse{inlineextras@#2}%
@@ -716,7 +729,9 @@
    \ifcsundef{#2@loaded}%
      {\xpg@nogloss{#2}}%
      {\select@@language{#2}%
+      \undef\xpg@languagename@bblequiv
       \setkeys{#2}{#1}%
+      \csname xpg@bblequivs@#2\endcsname % for complicated languages
       \use@localhyphenmins{#2}%
       \ifbool{#2@frenchspacing}{\frenchspacing}{\nonfrenchspacing}%
       \csuse{inlineextras@#2}\csuse{date#2}%
@@ -745,8 +760,10 @@
           }%
           \xpg@parsekeyvalue##1=\relax
       }%
-      \docsvlist{#1}
+      \docsvlist{#1}%
+      \undef\xpg@languagename@bblequiv
       \setkeys{#2}{#1}%
+      \csname xpg@bblequivs@#2\endcsname % for complicated languages
       \xpg@set@language{#2}%
      }%
 }
@@ -755,13 +772,18 @@
 \define@key{xpg@langvariant}{variant}{%
   \edef\xpg@vloaded{#1\ifx\xpg@vloaded\@empty\else,\xpg@vloaded\fi}}
 
+\def\xpg@select@bblequivlang#1{%
+  \ifstrempty{#1}
+    {\undef\xpg@languagename@bblequiv}
+    {\def\xpg@languagename@bblequiv{#1}}}
+  
 \newcommand{\xpg@set@language}[1]{%
    \select@language{#1}%
    \if@filesw%
-      \protected@write\@auxout{}{\protect\select@language{#1}}%
-      \addtocontents{toc}{\protect\select@language{#1}}%
-      \addtocontents{lof}{\protect\select@language{#1}}%
-      \addtocontents{lot}{\protect\select@language{#1}}%
+      \protected@write\@auxout{}{\protect\xpg@select@bblequivlang{\csuse{xpg@languagename@bblequiv}}\protect\select@language{#1}}%
+      \addtocontents{toc}{\protect\xpg@select@bblequivlang{\csuse{xpg@languagename@bblequiv}}\protect\select@language{#1}}%
+      \addtocontents{lof}{\protect\xpg@select@bblequivlang{\csuse{xpg@languagename@bblequiv}}\protect\select@language{#1}}%
+      \addtocontents{lot}{\protect\xpg@select@bblequivlang{\csuse{xpg@languagename@bblequiv}}\protect\select@language{#1}}%
    \fi
 }
 

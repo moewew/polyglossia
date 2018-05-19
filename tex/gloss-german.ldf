@@ -241,4 +241,29 @@
   \ifgerman@babelshorthands\german@shorthands\fi
 }
 
+\def\xpg@bblequivs@german{%
+  \def\xpg@languagename@bblequiv{ngerman}% just to give a sensible default
+  \if@austrian@locale
+    \if@german@oldspelling
+      \def\xpg@languagename@bblequiv{austrian}%
+    \else
+      \def\xpg@languagename@bblequiv{naustrian}%
+    \fi
+  \else
+    \if@swiss@locale
+      \if@german@oldspelling
+        \def\xpg@languagename@bblequiv{swissgerman}%
+      \else
+        \def\xpg@languagename@bblequiv{nswissgerman}%
+      \fi
+    \else
+      \if@german@oldspelling
+        \def\xpg@languagename@bblequiv{german}%
+      \else
+        \def\xpg@languagename@bblequiv{ngerman}%
+      \fi
+    \fi
+  \fi
+}
+
 \endinput
